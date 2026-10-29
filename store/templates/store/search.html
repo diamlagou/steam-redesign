@@ -1,0 +1,95 @@
+{% extends "store/base.html" %}
+
+{% block title %}搜尋遊戲{% endblock %}
+
+{% block content %}
+<main class="search-layout">
+    <h1>搜尋遊戲</h1>
+
+    <form action="{% url 'search' %}" method="get" class="search-bar">
+        <label for="keyword">關鍵字</label>
+        <input type="search" id="keyword" name="q" value="{{ q }}" placeholder="輸入遊戲名稱或簡介中的關鍵字">
+        {% if zh %}<input type="hidden" name="zh" value="1">{% endif %}
+        {% for tag_id in selected_tags %}<input type="hidden" name="tag" value="{{ tag_id }}">{% endfor %}
+        {% if players %}<input type="hidden" name="players" value="{{ players }}">{% endif %}
+        {% if price %}<input type="hidden" name="price" value="{{ price }}">{% endif %}
+        {% if sale %}<input type="hidden" name="sale" value="1">{% endif %}
+        <button type="submit" class="btn-primary">搜尋</button>
+    </form>
+
+    <section class="applied">
+        <h2>已套用條件</h2>
+        {% if applied %}
+        <ul>
+            {% for label, remove_url in applied %}
+            <li>{{ label }} <a href="{{ remove_url }}" aria-label="移除 {{ label }}">✕</a></li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'search' %}" class="btn btn-small">全部清除</a>
+        {% else %}
+        <p class="no-filter">尚未套用任何條件，目前顯示全部遊戲。</p>
+        {% endif %}
+        <p class="result-count">共 <strong>{{ result_count }}</strong> 款符合（全部 {{ total_games }} 款）</p>
+    </section>
+
+    <aside>
+        <h2>篩選</h2>
+        <form action="{% url 'search' %}" method="get" class="filter-form">
+            {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+
+            <fieldset>
+                <legend>語言</legend>
+                <label><input type="checkbox" name="zh" value="1" {% if zh %}checked{% endif %}> 支援繁體中文</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>玩法（可多選）</legend>
+                {% for tag in all_tags %}
+                <label><input type="checkbox" name="tag" value="{{ tag.id }}" {% if tag.id in selected_tags %}checked{% endif %}> {{ tag.name }}</label>
+                {% endfor %}
+            </fieldset>
+
+            <fieldset>
+                <legend>遊玩人數</legend>
+                <label><input type="radio" name="players" value="" {% if not players %}checked{% endif %}> 不限</label>
+                {% for value, label in player_choices %}
+                <label><input type="radio" name="players" value="{{ value }}" {% if players == value %}checked{% endif %}> {{ label }}</label>
+                {% endfor %}
+            </fieldset>
+
+            <fieldset>
+                <legend>價格（折扣後）</legend>
+                <label><input type="radio" name="price" value="" {% if not price %}checked{% endif %}> 不限</label>
+                {% for value, label in price_choices %}
+                <label><input type="radio" name="price" value="{{ value }}" {% if price == value %}checked{% endif %}> {{ label }}</label>
+                {% endfor %}
+                <label><input type="checkbox" name="sale" value="1" {% if sale %}checked{% endif %}> 只看特價</label>
+            </fieldset>
+
+            <button type="submit" class="btn-primary">套用篩選</button>
+        </form>
+    </aside>
+
+    <section class="game-grid">
+        <h2>搜尋結果</h2>
+
+        {% for game in games %}
+        <article style="--cover: {{ game.cover_color }};">
+            <h3><a href="{% url 'game_detail' game.pk %}">{{ game.name }}</a></h3>
+            <p>{{ game.players_display }}{% for tag in game.tags.all %}・{{ tag.name }}{% endfor %}{% if game.supports_zh_tw %}｜✓ 繁體中文{% endif %}</p>
+            <p>
+                {% if game.discount %}<del>NT${{ game.price }}</del> {% endif %}
+                <strong>NT${{ game.final }}</strong>
+                {% if game.discount %}（-{{ game.discount }}%）{% endif %}
+            </p>
+        </article>
+        {% empty %}
+        <div class="empty-result">
+            <h3>找不到符合條件的遊戲</h3>
+            <p>試著移除部分條件，或換一個關鍵字。</p>
+            <a href="{% url 'search' %}" class="btn">清除所有條件</a>
+        </div>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}

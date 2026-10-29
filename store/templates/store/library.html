@@ -1,0 +1,39 @@
+{% extends "store/base.html" %}
+
+{% block title %}我的收藏庫{% endblock %}
+
+{% block content %}
+<main>
+    <h1>我的收藏庫</h1>
+    <p>共 {{ items|length }} 款遊戲</p>
+
+    <section class="library-list">
+        {% for item in items %}
+        <article>
+            <h2>{{ item.game.name }}</h2>
+            <p>{{ item.purchased_at|date:"Y 年 n 月 j 日" }}購買・遊玩 {{ item.playtime_hours }} 小時</p>
+            {% with refund=item.active_refund %}
+            {% if refund %}
+            <p class="refund-pending">退款{{ refund.get_status_display }}（{{ refund.number }}）</p>
+            {% elif item.is_refund_eligible %}
+            <p class="refund-ok">可退款・剩 {{ item.refund_days_left }} 天</p>
+            {% elif item.refund_days_left == 0 %}
+            <p class="refund-no">已超過退款期限</p>
+            {% else %}
+            <p class="refund-no">遊玩已超過 2 小時，無法退款</p>
+            {% endif %}
+            {% endwith %}
+            <button type="button" class="btn-buy">開始遊戲</button>
+            <a href="{% url 'refund_request' item.pk %}" class="btn btn-refund">申請退款</a>
+        </article>
+        {% empty %}
+        <p>收藏庫目前沒有遊戲，<a href="{% url 'search' %}">去找遊戲</a>。</p>
+        {% endfor %}
+    </section>
+
+    <aside>
+        <h2>退款規則</h2>
+        <p>購買 14 天內，且遊玩未滿 2 小時的遊戲可以申請退款。</p>
+    </aside>
+</main>
+{% endblock %}

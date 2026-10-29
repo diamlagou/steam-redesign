@@ -1,0 +1,96 @@
+{% extends "store/base.html" %}
+
+{% block title %}{{ game.name }}{% endblock %}
+
+{% block content %}
+<main>
+    <p><a href="{% url 'index' %}">商店</a> ＞ {{ game.name }}</p>
+    <h1>{{ game.name }}</h1>
+
+    <section class="highlights">
+        <h2>購買前重點</h2>
+        <dl>
+            <dt>分級</dt>
+            <dd>{{ game.get_rating_display }}</dd>
+
+            <dt>語言</dt>
+            <dd>{% if game.supports_zh_tw %}✓ 繁體中文{% else %}未支援繁體中文{% endif %}</dd>
+
+            <dt>遊戲方式</dt>
+            <dd>{{ game.players_display }}{% for tag in game.tags.all %}・{{ tag.name }}{% endfor %}</dd>
+
+            <dt>電腦需求</dt>
+            <dd>記憶體 {{ game.memory_gb }} GB <button type="button" class="btn-primary">檢查我的電腦</button></dd>
+        </dl>
+    </section>
+
+    <section>
+        <h2>關於這款遊戲</h2>
+        <p>{{ game.description|default:"尚無簡介。" }}</p>
+    </section>
+
+    <section>
+        <h2>電腦需求</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>遊戲需要</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>作業系統</td>
+                    <td>{{ game.os_requirement }}</td>
+                </tr>
+                <tr>
+                    <td>記憶體</td>
+                    <td>{{ game.memory_gb }} GB</td>
+                </tr>
+                <tr>
+                    <td>硬碟空間</td>
+                    <td>{{ game.storage_gb }} GB</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>選擇版本</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>版本</th>
+                    <th>內容</th>
+                    <th>價格</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for edition in game.editions.all %}
+                <tr>
+                    <td>{{ edition.name }}</td>
+                    <td>{{ edition.content|default:"完整遊戲" }}</td>
+                    <td>NT${{ edition.price }}</td>
+                    <td>
+                        {% include "store/library_button.html" %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td>標準版</td>
+                    <td>完整遊戲</td>
+                    <td>
+                        {% if game.discount %}<del>NT${{ game.price }}</del> {% endif %}
+                        NT${{ game.final_price }}
+                    </td>
+                    <td>
+                        {% include "store/library_button.html" %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+{% endblock %}

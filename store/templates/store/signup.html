@@ -1,0 +1,30 @@
+{% extends "store/base.html" %}
+
+{% block title %}會員註冊{% endblock %}
+
+{% block content %}
+<main class="login-page">
+    <h1>會員註冊</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <p>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <span class="field-error">{{ field.errors|join:" " }}</span>
+            {% endif %}
+            {% if field.help_text %}
+            <small class="helptext">{{ field.help_text|safe }}</small>
+            {% endif %}
+        </p>
+        {% endfor %}
+
+        <button type="submit" class="btn-primary">註冊</button>
+    </form>
+
+    <p>已經有帳號？<a href="{% url 'login' %}">登入</a></p>
+</main>
+{% endblock %}

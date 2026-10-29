@@ -1,0 +1,50 @@
+{% extends "store/base.html" %}
+
+{% block title %}申請退款{% endblock %}
+
+{% block content %}
+<main class="refund-page">
+    <p><a href="{% url 'library' %}">收藏庫</a> ＞ {{ item.game.name }} ＞ 申請退款</p>
+    <h1>申請退款：{{ item.game.name }}</h1>
+
+    {% include "store/refund_eligibility.html" %}
+
+    {% if item.is_refund_eligible %}
+    <section>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="step" value="confirm">
+
+            <h2>退款方式</h2>
+            <fieldset>
+                {% for radio in form.method %}
+                <label class="chip-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                {% endfor %}
+            </fieldset>
+
+            <h2>退款原因</h2>
+            <fieldset>
+                {% for radio in form.reason %}
+                <label class="chip-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                {% endfor %}
+            </fieldset>
+            {% if form.reason.errors %}
+            <p class="field-error">{{ form.reason.errors|join:" " }}</p>
+            {% endif %}
+
+            <h2>備註</h2>
+            {{ form.note }}
+
+            <div class="form-actions">
+                <a href="{% url 'library' %}" class="btn">取消</a>
+                <button type="submit" class="btn-primary">下一步：確認</button>
+            </div>
+        </form>
+    </section>
+    {% else %}
+    <div class="form-actions">
+        <a href="{% url 'library' %}" class="btn">回到收藏庫</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+
+{% block title %}退款申請已送出{% endblock %}
+
+{% block content %}
+<main class="refund-page">
+    <section class="done-card">
+        <h1 class="refund-ok">✓ 退款申請已送出</h1>
+        <p>申請編號：<strong>{{ refund.number }}</strong></p>
+
+        <table class="summary-table">
+            <tbody>
+                <tr>
+                    <th>退款遊戲</th>
+                    <td>{{ refund.library_item.game.name }}</td>
+                </tr>
+                <tr>
+                    <th>退款方式</th>
+                    <td>{{ refund.get_method_display }}</td>
+                </tr>
+                <tr>
+                    <th>退款原因</th>
+                    <td>{{ refund.get_reason_display }}</td>
+                </tr>
+                <tr>
+                    <th>申請時間</th>
+                    <td>{{ refund.created_at|date:"Y 年 n 月 j 日 H:i" }}</td>
+                </tr>
+                <tr>
+                    <th>目前狀態</th>
+                    <td>{{ refund.get_status_display }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="muted">審核結果約 1～3 天內通知，也可以在收藏庫查看進度。</p>
+        <a href="{% url 'library' %}" class="btn-primary btn">回到收藏庫</a>
+    </section>
+</main>
+{% endblock %}

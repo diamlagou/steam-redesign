@@ -1,0 +1,51 @@
+{% extends "store/base.html" %}
+
+{% block title %}商店首頁{% endblock %}
+
+{% block content %}
+<main>
+    <section class="hero">
+        <h1>快速找遊戲</h1>
+        <p>不用懂遊戲術語，選幾個條件就好</p>
+
+        <form action="{% url 'search' %}" method="get">
+            <fieldset>
+                <legend>語言</legend>
+                <label class="chip-option"><input type="checkbox" name="zh" value="1"><span>繁體中文</span></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>玩法（可多選）</legend>
+                {% for tag in all_tags %}
+                <label class="chip-option"><input type="checkbox" name="tag" value="{{ tag.id }}"><span>{{ tag.name }}</span></label>
+                {% endfor %}
+            </fieldset>
+
+            <fieldset>
+                <legend>價格</legend>
+                <label class="chip-option"><input type="radio" name="price" value="" checked><span>不限</span></label>
+                {% for value, label in price_choices %}
+                <label class="chip-option"><input type="radio" name="price" value="{{ value }}"><span>{{ label }}</span></label>
+                {% endfor %}
+                <label class="chip-option"><input type="checkbox" name="sale" value="1"><span>特價中</span></label>
+            </fieldset>
+
+            <button type="submit" class="btn-primary">找遊戲（共 {{ total_games }} 款）</button>
+        </form>
+    </section>
+
+    <section class="game-grid">
+        <h2>本週特價</h2>
+
+        {% for game in sale_games %}
+        <article style="--cover: {{ game.cover_color }};">
+            <h3><a href="{% url 'game_detail' game.pk %}">{{ game.name }}</a></h3>
+            <p>{% for tag in game.tags.all %}{{ tag.name }}{% if not forloop.last %}、{% endif %}{% endfor %}{% if game.supports_zh_tw %}｜✓ 繁體中文{% endif %}</p>
+            <p><del>NT${{ game.price }}</del> <strong>NT${{ game.final_price }}</strong>（-{{ game.discount }}%）</p>
+        </article>
+        {% empty %}
+        <p>本週沒有特價遊戲。</p>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}

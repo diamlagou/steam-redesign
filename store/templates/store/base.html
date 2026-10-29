@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Steam Redesign{% endblock %}｜Steam Redesign</title>
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+    {% with current=request.resolver_match.url_name %}
+    <header>
+        <nav>
+            <a href="{% url 'index' %}" {% if current == 'index' %}class="active"{% endif %}>商店</a>
+            <a href="{% url 'search' %}" {% if current == 'search' %}class="active"{% endif %}>搜尋遊戲</a>
+            <a href="{% url 'library' %}" {% if current == 'library' %}class="active"{% endif %}>收藏庫</a>
+
+            <div class="nav-right">
+                {% if user.is_authenticated %}
+                <span class="nav-user">你好，{{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" class="nav-logout">
+                    {% csrf_token %}
+                    <button type="submit">登出</button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" {% if current == 'login' %}class="active"{% endif %}>登入</a>
+                <a href="{% url 'signup' %}" {% if current == 'signup' %}class="active"{% endif %}>註冊</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    {% endwith %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <p class="message message-{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <p>第 16 組｜Steam Redesign 期中專題</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<section class="eligibility {% if item.is_refund_eligible %}is-ok{% else %}is-no{% endif %}">
+    <div class="eligibility-head">
+        {% if item.is_refund_eligible %}
+        <h2 class="refund-ok">✓ 符合退款資格</h2>
+        {% else %}
+        <h2 class="refund-bad">✕ 不符合退款資格</h2>
+        {% endif %}
+        <span class="muted">退款條件：購買 14 天內，且遊玩未滿 2 小時</span>
+    </div>
+
+    <div class="progress-grid">
+        <div>
+            <div class="progress-label"><span>購買天數</span><strong>{{ item.days_since_purchase }} / 14 天</strong></div>
+            <div class="progress"><div class="progress-bar {% if item.refund_days_left == 0 %}over{% endif %}" style="width: {{ item.days_progress }}%;"></div></div>
+        </div>
+        <div>
+            <div class="progress-label"><span>遊玩時數</span><strong>{{ item.playtime_hours }} / 2 小時</strong></div>
+            <div class="progress"><div class="progress-bar {% if item.playtime_hours >= 2 %}over{% endif %}" style="width: {{ item.hours_progress }}%;"></div></div>
+        </div>
+    </div>
+
+    {% if not item.is_refund_eligible %}
+    <ul class="block-reasons">
+        {% for reason in item.refund_block_reasons %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</section>
